@@ -26,5 +26,4 @@ val catsEffectVersion = "3.7.0" // requires Scala Native 0.5.x and above for par
 // use triple '%' for Scala Native like Scala JS
 libraryDependencies ++= Seq("org.typelevel" %%% "cats-effect" % catsEffectVersion)
 
-//Compile / mainClass := Some("org.teckhooi.Starve")
 Compile / mainClass := Some("org.teckhooi.ConcurrentRunCats")
