@@ -1,13 +1,12 @@
 package org.teckhooi
 
+import cats.FlatMap
 import cats.effect.kernel.Sync
 import cats.effect.std.{Console, Random}
 import cats.effect.{ExitCode, IO, IOApp, Temporal}
 import cats.implicits.toTraverseOps
-import cats.syntax.apply.*
 import cats.syntax.flatMap.*
 import cats.syntax.functor.*
-import cats.{FlatMap, MonadThrow}
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.Duration
@@ -35,14 +34,32 @@ object ConcurrentRunCats extends IOApp {
       _       <- IO.println(s"Time taken to complete all tasks, ${(endTime - startTime).toMillis}ms")
     } yield ExitCode.Success
 
-  private def task[F[_]: {Console, Temporal, Sync, FlatMap}](
+  /**
+   * Use the following method for Scala pre-v3.7.x. Otherwise, this function won't compile
+   *
+   * Please refer to https://stackoverflow.com/questions/74601647/contextbound-temporal-causes-cannot-resolve-symbol-flatmap
+   * for details
+   *
+   * private def task[F[_]: Console: Temporal: Sync: FlatMap](name: String, delay: Duration): F[Unit] = {
+   *   val x = Sync[F].flatMap(Sync[F].delay(Thread.currentThread().getName))(startThreadName =>
+   *     Console[F].println(s"Starting task $name on $startThreadName..."))
+   *
+   *   val y = Sync[F].flatMap(x)(_ => Temporal[F].sleep(delay))
+   *
+   *   val z = Sync[F].flatMap(y)(_ => Sync[F].delay(Thread.currentThread().getName))
+   *
+   *   Sync[F].flatMap(z)(endThreadName =>
+   *     Console[F].println(s"Task $name completed after ${delay.toMillis}ms on $endThreadName"))
+   * }
+   */
+  private def task[F[_]: {Console, Temporal, Sync, FlatMap}](  // Method (A)
       name: String,
       delay: Duration
   ): F[Unit] =
     for {
       startThreadName <- Sync[F].delay(Thread.currentThread().getName)
-      _               <- Console[F].println(s"Starting $name on $startThreadName...") *> Temporal[F].sleep(delay)
-      endThreadName   <- Sync[F].delay(Thread.currentThread().getName)
-      _               <- Console[F].println(s"$name completed after ${delay.toMillis}ms on $endThreadName")
+      _ <- Console[F].println(s"Starting task $name on $startThreadName...") >> Temporal[F].sleep(delay)
+      endThreadName <- Sync[F].delay(Thread.currentThread().getName)
+      _ <- Console[F].println(s"Task $name completed after ${delay.toMillis}ms on $endThreadName")
     } yield ()
 }

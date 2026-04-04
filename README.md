@@ -14,3 +14,5 @@ Scala Native 0.4.x supports single threaded model and it is incompatible with Ca
 * `Compile / mainClass` must be defined in the `build.sbt`
 * `name` will be the name of the final executable. For `nativeLinkReleaseFast` release, `-release-fast` will be appended to the executable filename. 
 * For earlier versions of Cats Effect before __v.3.7.x__, `-out` will be appended to the executable filename.
+* When working with Scala v.3.6.x and below. change the method `org.teckhooi.ConcurrentRunCats.task(...)` according 
+to the comment. Otherwise, the code won't compile

@@ -8,7 +8,7 @@ name         := "concurrent-run"
 logLevel := Level.Info
 
 // import to add Scala Native options
-import scala.scalanative.build._
+import scala.scalanative.build.*
 
 // defaults set with common options shown
 nativeConfig ~= { c =>
@@ -27,3 +27,5 @@ val catsEffectVersion = "3.7.0" // requires Scala Native 0.5.x and above for par
 libraryDependencies ++= Seq("org.typelevel" %%% "cats-effect" % catsEffectVersion)
 
 Compile / mainClass := Some("org.teckhooi.ConcurrentRunCats")
+
+scalacOptions ++= Seq("-no-indent")
