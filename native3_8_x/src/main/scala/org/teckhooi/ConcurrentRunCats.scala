@@ -9,7 +9,7 @@ import cats.syntax.flatMap.*
 import cats.syntax.functor.*
 
 import java.util.concurrent.TimeUnit
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.{Duration, DurationInt}
 import scala.util.Try
 
 object ConcurrentRunCats extends IOApp {
@@ -27,7 +27,7 @@ object ConcurrentRunCats extends IOApp {
         .traverse(x =>
           rnd
             .nextIntBounded(300)
-            .flatMap(delay => task[IO](x.toString, Duration(100 + delay, TimeUnit.MILLISECONDS)).start)
+            .flatMap(delay => task[IO](x.toString, (100 + delay).millis).start)
         )
       _       <- fiberList.map(_.joinWithNever).sequence
       endTime <- IO.realTime
