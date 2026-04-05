@@ -35,22 +35,7 @@ object ConcurrentRunCats extends IOApp {
     } yield ExitCode.Success
 
   /**
-   * Use the following method for Scala pre-v3.7.x. Otherwise, this function won't compile
-   *
-   * Please refer to https://stackoverflow.com/questions/74601647/contextbound-temporal-causes-cannot-resolve-symbol-flatmap
-   * for details
-   *
-   * private def task[F[_]: Console: Temporal: Sync: FlatMap](name: String, delay: Duration): F[Unit] = {
-   *   val x = Sync[F].flatMap(Sync[F].delay(Thread.currentThread().getName))(startThreadName =>
-   *     Console[F].println(s"Starting task $name on $startThreadName..."))
-   *
-   *   val y = Sync[F].flatMap(x)(_ => Temporal[F].sleep(delay))
-   *
-   *   val z = Sync[F].flatMap(y)(_ => Sync[F].delay(Thread.currentThread().getName))
-   *
-   *   Sync[F].flatMap(z)(endThreadName =>
-   *     Console[F].println(s"Task $name completed after ${delay.toMillis}ms on $endThreadName"))
-   * }
+   * Alternative code for Scala v.3.6.x and below. Please refer to {{native3_6_x}} project
    */
   private def task[F[_]: {Console, Temporal, Sync, FlatMap}](  // Method (A)
       name: String,
